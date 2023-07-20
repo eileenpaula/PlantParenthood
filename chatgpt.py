@@ -3,7 +3,7 @@ import requests
 import os
 import openai
 openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
-openai.api_key = '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'
+openai.api_key = os.environ.get('gpt_api_key')
 
 class ChatGPT:
 
@@ -30,3 +30,5 @@ class ChatGPT:
         result = response["choices"][0]["message"]["content"]
         return(result)
 
+sunflower = ChatGPT("Sunflower")
+print(sunflower.careCalender())
