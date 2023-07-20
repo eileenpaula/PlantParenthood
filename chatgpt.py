@@ -29,6 +29,3 @@ class ChatGPT:
         )
         result = response["choices"][0]["message"]["content"]
         return(result)
-
-sunflower = ChatGPT("Sunflower")
-print(sunflower.careCalender())
