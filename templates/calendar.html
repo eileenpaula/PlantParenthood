@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8' />
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+        <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+        <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
+        <script src="https://static.cloudflareinsights.com/beacon.min.js"></script>
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' />
+        <link href="{{ url_for('static', filename='calendar.css') }}" rel="stylesheet" type="text/css" />
+    </head>
+    
+    <body>
+        <nav>
+            <h1> Plant Parenthood </h1>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Calendar</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="checklist">
+            <div class="checklist-item">
+                <input type="checkbox" id="plant1" />
+                <label for="plant1"></label>
+                <p>Plant 1</p>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="plant2" />
+                <label for="plant2"></label>
+                <p>Plant 2</p>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="plant3" />
+                <label for="plant3"></label>
+                <p>Plant 3</p>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="plant4" />
+                <label for="plant4"></label>
+                <p>Plant 4</p>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="plant5" />
+                <label for="plant5"></label>
+                <p>Plant 5</p>
+            </div>
+            <div class="checklist-item">
+                <input type="checkbox" id="plant6" />
+                <label for="plant6"></label>
+                <p>Plant 6</p>
+            </div>
+        </div>
+        
+    </body>
+    
+    <body>
+        <div id='calendar'></div>
+    </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let calendarEl = document.getElementById('calendar');
+            let calendar = new FullCalendar.Calendar
+            (calendarEl, {
+                events : [
+                    {% for event in events %}
+                    {
+                        title : '{{event.plant}}',
+                        description: '{{event.todo}}',
+                        start : '{{event.date}}',
+                    },
+                    {% endfor %}
+                ],
+                eventColor: 'green'
+            });
+
+            calendar.on('eventClick', function(info) {
+                alert(info.event.title + '\n' + info.event.extendedProps.description);
+            });
+
+            calendar.render()
+        });
+    </script>
+    
+</html>
+
+
