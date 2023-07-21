@@ -1,0 +1,85 @@
+html {
+  background-color: rgb(116, 165, 116);
+}
+
+#calendar {
+  margin: 5% 10%;
+  padding: 5% 5%;
+  background-color: rgb(216, 244, 216);
+}
+
+nav {
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+nav h1 {
+color: #fff;
+margin-right: auto;
+padding: 0 16px;
+}
+
+nav ul {
+list-style-type: none;
+margin: 0;
+padding: 0;
+}
+
+nav ul li {
+display: inline-block;
+}
+
+nav ul li a {
+display: block;
+color: #fff;
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+}
+
+nav ul li a:hover {
+background-color: #111;
+}
+
+.checklist {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 10px;
+  padding: 5% 10% 0% 10%;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  size: 150%;
+}
+
+.checklist-item input[type="checkbox"] {
+  display: none;
+}
+
+.checklist-item label {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background-color: lightgreen;
+  border: 1px solid #aaa;
+  cursor: pointer;
+}
+
+.checklist-item input[type="checkbox"]:checked + label::before {
+  content: "\2713";
+  display: block;
+  text-align: center;
+  line-height: 20px;
+  color: white;
+  font-size: 14px;
+}
+
+.checklist-item p {
+  color: rgb(205, 237, 205);
+  padding-left: 5%;
+  font-size: 120%;
+}
