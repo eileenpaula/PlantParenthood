@@ -51,5 +51,7 @@ class ChatGPT:
         )
         result = response["choices"][0]["message"]["content"]
         return result
+    #f
+
 
 
