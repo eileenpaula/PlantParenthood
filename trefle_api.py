@@ -14,7 +14,6 @@ class Plant_image:
 
             # Parse the JSON data
             data = response.json()
-            pprint.pprint(data)
             # Extract the image URL
             image_url = data['data'][0]['image_url']
 
@@ -28,6 +27,6 @@ class Plant_image:
 
 
 # plant = Plant_image('sunflower')
-# plant.image()
+# print(plant.image())
 
 
