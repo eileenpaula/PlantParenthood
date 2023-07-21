@@ -2,6 +2,9 @@ import os
 import requests
 import random
 import re
+import json
+from PlantParenthood.chatgpt import ChatGPT
+from PlantParenthood.trefle_api import Plant_image
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -127,6 +130,17 @@ def logout():
         return render_template('logout.html', subtitle='Logout')
     else:
         return redirect("/")
+
+@app.route('/info')
+def display_plant_info():
+    plant_name = 'rose'
+    plant = Plant_image(name=plant_name)
+    plant_image = plant.image()
+    data = ChatGPT(name=plant_name)
+    plant_data = data.info()
+    plant_data_dict = json.loads(plant_data)
+    return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
+
     
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)
