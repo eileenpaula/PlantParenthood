@@ -19,7 +19,9 @@ proxied = FlaskBehindProxy(app)
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
-app.config['SECRET_KEY'] = 'super secret key'
+app.config['WTF_CSRF_ENABLED'] = True
+# app.config['SECRET_KEY'] = 'super secret key'
+app.config['SECRET_KEY'] = 'sk-QI3n64b9a63da2fa31627'
 Session(app)
 
 # Database
@@ -38,9 +40,25 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
+    plants = db.relationship('Plants', backref='user', lazy=True)
+    # plant_sciname = db.relationship('Plants', backref='user', lazy=True)
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
+    
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class Plants(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    plant_name = db.Column(db.String(20), nullable=False)
+    # plant_sciname = db.Column(db.String(20), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    def __repr__(self):
+        return f"Plants('{self.plant_name}')"
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -80,13 +98,13 @@ with app.app_context():
 
 @app.route("/")
 @app.route("/home")
-def home_page():
+def home():
     return render_template('home.html')
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('home_page'))
+        return redirect(url_for('home'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -95,14 +113,14 @@ def register():
         db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
         login_user(user)
-        return redirect(url_for('home_page'))
+        return redirect(url_for('home'))
 
     return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home_page'))
+        return redirect(url_for('home'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -110,7 +128,7 @@ def login():
         if user and user.password == form.password.data:
             login_user(user)
             flash(f'Welcome Back {form.username.data}!', 'success')
-            return redirect(url_for('home_page'))
+            return redirect(url_for('home'))
         else:
             flash('Invalid username or password.', 'danger')
 
@@ -127,6 +145,52 @@ def logout():
         return render_template('logout.html', subtitle='Logout')
     else:
         return redirect("/")
+    
+@app.route("/portfolio", methods=['GET', 'POST'])
+@login_required
+def portfolio():
+    pname = None
+    ppic = None
+
+    if request.method == 'POST':
+        pname = request.form['plant_submit']
+
+        url = 'https://perenual.com/api/species-list?page=1&key=sk-QI3n64b9a63da2fa31627'
+        response = requests.get(url).json()
+
+        # Search name in common names for the plant
+        for plant_data in response['data']:
+            if plant_data['common_name'] == pname:
+                # ppic = response['data'][0]['default_image']['regular_url']
+                ppic = plant_data['default_image']['regular_url']
+                print(ppic)
+                # plant_names = Plants(plant_name=pname, plant_sciname=plant_data['scientific_name'], user_id=current_user.id)
+                plant_names = Plants(plant_name=pname, user_id=current_user.id)
+                db.session.add(plant_names)
+                db.session.commit()
+                allplants = Plants.query.filter_by(user_id=current_user.id).all()
+                return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
+        
+        # If name is not in common_names then look for it in other_names
+            elif plant_data['other_name'] == pname:
+                ppic = plant_data['default_image']['regular_url']
+                print(ppic)
+                # plant_names = Plants(plant_name=pname, plant_sciname=plant_data['scientific_name'], user_id=current_user.id)
+                plant_names = Plants(plant_name=pname, user_id=current_user.id)
+                db.session.add(plant_names)
+                db.session.commit()
+                allplants = Plants.query.filter_by(user_id=current_user.id).all()
+                return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
+            else:
+                ppic = "There is no image for this plant!"
+                return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
+    
+    allplants = Plants.query.filter_by(user_id=current_user.id).all()
+    return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants, ppic = ppic, pname = pname)
+
+
+        
+        
     
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)

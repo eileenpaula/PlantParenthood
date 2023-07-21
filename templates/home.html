@@ -1,4 +1,4 @@
-{% extends 'layoutt.html' %} 
+{% extends 'layout.html' %} 
 
 
 {% block content %} 
@@ -15,10 +15,15 @@
 <h1>Welcome to Plant-Parenthood</h1>
 <h2>Children? In this Economy? Have Plants Instead! </h2>
 <p> What's Your Child's Species </p>
-<form class="search-form" action="{{ url_for('home') }}" method="POST">
-    {{ form.hidden_tag() }}
-    <input type="text" name="search" placeholder="Enter Plant Type...">
-    {{ form.submit(class="btn btn-primary search-button", value="Search") }}
-</form> 
+<form method="POST" action="/portfolio">
+    <div class="searchBox">
+      <input id="plantname_in" name="plant_submit" type="text" autofocus placeholder="Plant Name"/>
+    </div>
+    <div class="inlineForm">
+      <div>
+        <button class="btn" id="plant_submit" type="submit">Submit</button>
+      </div>
+    </div>
+</form>
 
 {% endblock %}

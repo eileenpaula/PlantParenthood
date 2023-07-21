@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='personalized.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='random.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='login.css') }}"> -->
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Lilita+One&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body>
+
+
+  <header>
+    <div class="container">
+      <h1 class = "websitetitle">Plants </h1>
+      {% if current_user.is_authenticated %}
+        <p class="username" style = "color:white; font-size:18px;">Logged In As: {{ current_user.username }}</p>
+      {% endif %}
+    </div>
+  </header>
+
+  <nav class="navbar">
+    <div class="container">
+    
+      <a href="/" >Welcome</a>
+      <a href="/portfolio" >Portfolio</a>
+      <a href="/register" >Register</a>
+      {% if current_user.is_authenticated %}
+        <a href="/logout">Logout</a>
+      {% else %}
+        <a href="/login">Login</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="card">
+      <h1 class="card-title">{% block subtitle %}{% endblock %}</h1>
+      <p class="card-text">{% block text %}{% endblock %}</p>
+      {% block content %}
+      {% endblock %}
+    </div>
+  </div>
+</body>
+
+</html>

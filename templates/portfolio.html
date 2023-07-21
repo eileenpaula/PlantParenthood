@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Plant Portfolio
+{% endblock %}
+
+{% block main %}
+
+    {% if pname %}
+        <div >
+            <h1 style = "color:#0077B6">Your Children!</h1>
+            <ul>
+                {% for plant in plants %}
+                <li>
+                    <div class = "box">
+                    <h3>{{plant.plant_name}}</h3>
+                    <img src= "{{ppic}}">
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% else %}
+        <p>No plants added.</p>
+    {% endif %}
+
+{% endblock %}
