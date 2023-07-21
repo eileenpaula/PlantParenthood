@@ -12,14 +12,14 @@ class ChatGPT:
     def __init__(self, name):
         self.name = name
 
-    def careCalender(self):
+    def careCalendar(self):
         plant_name = self.name
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo",
             messages=[
                 {
                     "role": "system",
-                    "content": "You will be provided with a plant name, your task is to generate a dictionary of length 30 with the days as keys of a real-life 30-days calender with insturctions on how to take care of the plant. Assume the plant is already grown"
+                    "content": "You will be provided with a plant name, your task is to generate a dictionary with the integer number as keys of a real-life 30-days calender starting with today's date with insturctions on how to take care of the plant. Assume the plant is already grown"
                 },
                 {
                     "role": "user",
@@ -51,7 +51,6 @@ class ChatGPT:
         )
         result = response["choices"][0]["message"]["content"]
         return result
-    #f
-
+    
 
 

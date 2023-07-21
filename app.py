@@ -81,11 +81,11 @@ with app.app_context():
     db.create_all()
 
 
-@app.route("/")
 @app.route("/home")
 def home_page():
     return render_template('home.html')
 
+@app.route("/")
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
