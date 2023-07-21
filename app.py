@@ -3,8 +3,6 @@ import requests
 import random
 import re
 import json
-from PlantParenthood.chatgpt import ChatGPT
-from PlantParenthood.trefle_api import Plant_image
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -15,6 +13,8 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from chatgpt import ChatGPT
+from trefle_api import Plant_image
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
@@ -75,14 +75,21 @@ class LoginForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if not user:
             raise ValidationError('Username does not exist. Create an account')
-        
 
 with app.app_context():
     db.create_all()
 
-
-@app.route("/home")
+@app.route("/home", methods=['GET', 'POST'])
 def home_page():
+    if request.method == 'POST':
+        if(request.form.get("search") is not None):
+            plant_name = request.form.get("search")
+            plant = Plant_image(name=plant_name)
+            plant_image = plant.image()
+            data = ChatGPT(name=plant_name)
+            plant_data = data.info()
+            plant_data_dict = json.loads(plant_data)
+            return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     return render_template('home.html')
 
 @app.route("/")
@@ -130,16 +137,6 @@ def logout():
         return render_template('logout.html', subtitle='Logout')
     else:
         return redirect("/")
-
-@app.route('/info')
-def display_plant_info():
-    plant_name = 'rose'
-    plant = Plant_image(name=plant_name)
-    plant_image = plant.image()
-    data = ChatGPT(name=plant_name)
-    plant_data = data.info()
-    plant_data_dict = json.loads(plant_data)
-    return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
 
     
 if __name__ == '__main__':
