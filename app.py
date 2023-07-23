@@ -211,7 +211,7 @@ def portfolio():
         #         return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
     
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
-    return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants, ppic = ppic, pname = pname)
+    return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
 
         
     
