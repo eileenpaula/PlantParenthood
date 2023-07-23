@@ -14,7 +14,7 @@ from wtforms.validators import ValidationError, DataRequired, Length, Email, Equ
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from chatgpt import ChatGPT
-from trefle_api import Plant_image
+from splash_api import Plant_image
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
