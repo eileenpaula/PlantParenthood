@@ -1,10 +1,12 @@
-{% extends "layoutt.html" %}
+{% extends 'register_layout.html' %}
+
 
 {% block subtitle %}Log In{% endblock %}
 
 {% block text %}Enter your credentials{% endblock %}
 
 {% block content %}
+
   <div class="form-container">
     <form method="POST" action="{{ url_for('login') }}">
       {{ form.hidden_tag() }}
@@ -27,4 +29,5 @@
       </div>
     </form>
   </div>
+
 {% endblock %}
