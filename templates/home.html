@@ -72,11 +72,17 @@
         <input type="text" name="search" placeholder="Enter Plant Type...">
         <input type="submit" class="btn btn-primary search-button" value="Search">
     </form>
-    <div class="image-upload">
-        <label for="uploadImage"> If you're not sure what kind of child you have, you can show us a pic!:</label>
-        <input type="file" name="Upload Image" id="uploadImage">
-        <button class="btn btn-primary" id="uploadButton">Upload</button>
-    </div>
+
+
+    <p>If you're not sure what kind of child you have, you can show us a pic!</p>
+        <form method='POST' enctype='multipart/form-data'>
+        {{ form.hidden_tag() }}
+        {{ form.file() }}
+        {{ form.submit() }}
+        {% if form.file.errors %}
+            <p style="color: red;">{{ form.file.errors[0] }}</p>
+        {% endif %}
+    </form>
 </center> 
 
 {% endblock %}

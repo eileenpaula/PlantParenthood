@@ -9,12 +9,13 @@ from flask_migrate import Migrate
 from flask_session import Session
 from flask_login import login_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, FileField
+from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo, InputRequired
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from chatgpt import ChatGPT
-from trefle_api import Plant_image
+from splash_api import Plant_image
+from image_rec import Image_Finder
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
@@ -23,6 +24,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['SECRET_KEY'] = 'super secret key'
+app.config['UPLOAD_FOLDER'] = 'static/files'
 Session(app)
 
 # Database
@@ -79,18 +81,46 @@ class LoginForm(FlaskForm):
 with app.app_context():
     db.create_all()
 
+
+def validate_image(form, field):
+    filename = field.data.filename.lower()
+    if not filename.endswith(('.jpg', '.jpeg', '.png', '.gif')):
+        field.errors.append('Invalid file format. Only JPG, JPEG, PNG, and GIF images are allowed.')
+
+class UploadFileForm(FlaskForm):
+    file = FileField("File", validators=[InputRequired(), validate_image])
+    submit = SubmitField("Upload File")
+
+# Function to process the uploaded image
+def process_uploaded_image(file):
+    # Set the filename to "image" and keep the original file extension
+    filename = 'image' + os.path.splitext(file.filename)[1]
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
+    # Create an instance of the Image_Finder class
+    image_finder = Image_Finder()
+    # Call the image() method to process the uploaded image
+    result = image_finder.image()
+
+    return result
+
+
+@app.route("/", methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
 def home_page():
+    form = UploadFileForm()
     if request.method == 'POST':
         if(request.form.get("search") is not None):
             plant_name = request.form.get("search")
-            plant = Plant_image(name=plant_name)
-            plant_image = plant.image()
-            data = ChatGPT(name=plant_name)
-            plant_data = data.info()
-            plant_data_dict = json.loads(plant_data)
+            plant_image, plant_data_dict = Plant_name(plant_name)
             return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
-    return render_template('home.html')
+
+    if form.validate_on_submit():
+        file = form.file.data
+        result = process_uploaded_image(file)
+        plant_image, plant_data_dict = Plant_name(result)
+        return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
+    return render_template('home.html', form=form)
 
 @app.route("/")
 @app.route("/register", methods=['GET', 'POST'])
@@ -138,6 +168,13 @@ def logout():
     else:
         return redirect("/")
 
+def Plant_name(plant_name):
+    plant = Plant_image(name=plant_name)
+    plant_image = plant.image()
+    data = ChatGPT(name=plant_name)
+    plant_data = data.info()
+    plant_data_dict = json.loads(plant_data)
+    return plant_image,plant_data_dict
     
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)
