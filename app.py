@@ -9,6 +9,7 @@ from flask_migrate import Migrate
 from flask_session import Session
 from flask_login import login_user
 from flask_wtf import FlaskForm
+from flask_cors import CORS
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
 from flask_behind_proxy import FlaskBehindProxy
@@ -26,6 +27,7 @@ app.config['WTF_CSRF_ENABLED'] = True
 # app.config['SECRET_KEY'] = 'super secret key'
 app.config['SECRET_KEY'] = 'sk-QI3n64b9a63da2fa31627'
 Session(app)
+CORS(app)
 
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
@@ -168,7 +170,7 @@ def portfolio():
     if request.method == 'POST':
         newname = request.form.get('rename')
         if newname is not None:
-            renamed = Plants(plant_name=newname, user_id=current_user.id)
+            renamed = Plants(plnt_name=newname, user_id=current_user.id)
             db.session.add(renamed)
             db.session.commit()
             
@@ -181,6 +183,19 @@ def portfolio():
 
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
     return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
+
+@app.route('/add_to_portfolio', methods=['POST'])
+@login_required
+def add_to_portfolio():
+    plant_name = request.json.get('plant_name')
+    if plant_name:
+        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
+        db.session.add(new_plant)
+        db.session.commit()
+        return {"message": "Plant added successfully!"}, 200
+    else:
+        return {"message": "Error: No plant name provided."}, 400
+
 
     
 if __name__ == '__main__':

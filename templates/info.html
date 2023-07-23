@@ -5,6 +5,7 @@
 {% block content %} 
 <html>
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Plant Information</title>
     <style>
         body {
@@ -133,12 +134,35 @@ font-size: 36px;
             <div class="toggle-container">
                 <label class="toggle-label">Add to Portfolio:</label>
                 <label class="switch">
-                    <input type="checkbox" id="portfolioToggle">
-                    <span class="slider round"></span>
-                </label>
+                  <input type="checkbox" id="portfolioToggle" onclick="addToPortfolio('{{plant_data["name"]}}')">
+                  <span class="slider round"></span>
+              </label>
             </div>
         </div>
     </div>
 </body>
 </html>
+<script>
+  function addToPortfolio(plantName) {
+      fetch('/add_to_portfolio', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              plant_name: plantName,
+          }),
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.message) {
+              alert(data.message);
+          }
+      })
+      .catch((error) => {
+          console.error('Error:', error);
+      });
+  }
+  </script>
+  
 {% endblock %}
