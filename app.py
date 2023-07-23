@@ -119,7 +119,7 @@ def home_page():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('home_page'))
 
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -128,14 +128,14 @@ def register():
         db.session.commit()
         flash(f'Account created for {form.username.data}!', 'success')
         login_user(user)
-        return redirect(url_for('home'))
+        return redirect(url_for('home_page'))
 
     return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('home'))
+        return redirect(url_for('home_page'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -143,7 +143,7 @@ def login():
         if user and user.password == form.password.data:
             login_user(user)
             flash(f'Welcome Back {form.username.data}!', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('home_page'))
         else:
             flash('Invalid username or password.', 'danger')
 
