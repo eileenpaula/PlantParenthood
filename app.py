@@ -116,6 +116,7 @@ def home_page():
             return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     return render_template('home.html')
 
+@app.route("/")
 @app.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -164,56 +165,23 @@ def logout():
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
-    # pname = None
-    # ppic = None
-
     if request.method == 'POST':
         newname = request.form.get('rename')
-        renamed = Plants(plant_name=newname, user_id=current_user.id)
-        db.session.add(renamed)
-        db.session.commit()
+        if newname is not None:
+            renamed = Plants(plant_name=newname, user_id=current_user.id)
+            db.session.add(renamed)
+            db.session.commit()
+            
+    elif request.method == 'GET':
+        if(request.form.get("delete") is not None):
+            plant_to_del = Plants.query.filter_by(user_id=current_user.id)
+            db.session.delete(plant_to_del)
+            db.session.commit()
+            flash("Plant deleted successfully!")
 
-    if request.method == 'GET':
-        delname = request.form.get('delete')
-        renamed = Plants(plant_name=delname, user_id=current_user.id)
-        db.session.add(renamed)
-        db.session.commit()
-        # pname = request.form['plant_submit']
-
-        # url = 'https://perenual.com/api/species-list?page=1&key=sk-QI3n64b9a63da2fa31627'
-        # response = requests.get(url).json()
-
-        # # Search name in common names for the plant
-        # for plant_data in response['data']:
-        #     if plant_data['common_name'] == pname:
-        #         # ppic = response['data'][0]['default_image']['regular_url']
-        #         ppic = plant_data['default_image']['regular_url']
-        #         print(ppic)
-        #         # plant_names = Plants(plant_name=pname, plant_sciname=plant_data['scientific_name'], user_id=current_user.id)
-        #         plant_names = Plants(plant_name=pname, user_id=current_user.id)
-        #         db.session.add(plant_names)
-        #         db.session.commit()
-        #         allplants = Plants.query.filter_by(user_id=current_user.id).all()
-        #         return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
-        
-        # # If name is not in common_names then look for it in other_names
-        #     elif plant_data['other_name'] == pname:
-        #         ppic = plant_data['default_image']['regular_url']
-        #         print(ppic)
-        #         # plant_names = Plants(plant_name=pname, plant_sciname=plant_data['scientific_name'], user_id=current_user.id)
-        #         plant_names = Plants(plant_name=pname, user_id=current_user.id)
-        #         db.session.add(plant_names)
-        #         db.session.commit()
-        #         allplants = Plants.query.filter_by(user_id=current_user.id).all()
-        #         return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
-        #     else:
-        #         ppic = "There is no image for this plant!"
-        #         return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', ppic = ppic, pname = pname)
-    
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
     return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
 
-        
     
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)

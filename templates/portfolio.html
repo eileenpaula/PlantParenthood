@@ -17,10 +17,9 @@
                     <img class="left-image" src= {{image}} alt="Left Image">
                     <div class="flex">
                         <form action="{{ url_for('portfolio') }}" method="POST">
-                            <input type="text" class="flex-child" id="rename" value="rename" autofocus placeholder="Rename">
-                        </form>
-                        <form action="{{ url_for('portfolio') }}" method="GET">
-                            <input type="button" class="flex-child" id="delete"  value="delete">
+                            <input type="text" class="flex-child" name="rename" value="rename" autofocus placeholder="Rename">
+                            <input type="hidden" class="flex-child" name="delete"  value="delete">
+                            <input type="submit" class="flex-child" value="Submit">
                         </form>
                     </div>
                     </div>
