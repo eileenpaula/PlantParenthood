@@ -6,7 +6,7 @@ import os
 import openai
 openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
 #openai.api_key1 = os.environ.get('gpt_api_key')
-
+openai.api_key= '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'
 
 class ChatGPT:
 
@@ -45,6 +45,26 @@ class ChatGPT:
                 {
                     "role": "user",
                     "content": "Plant Name: " + plant_name
+                }
+            ],
+            temperature=0.3,
+            max_tokens=2000
+        )
+        result = response["choices"][0]["message"]["content"]
+        return result
+
+    def is_plant(self):
+        plant_name = self.name
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You will be provided with an object name. Your task is to return a true or false value on whether the object is a plant."
+                },
+                {
+                    "role": "user",
+                    "content": "object Name: " + plant_name
                 }
             ],
             temperature=0.3,

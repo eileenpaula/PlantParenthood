@@ -114,13 +114,14 @@ def home_page():
         if search_query:
             plant_name = search_query
             plant_image, plant_data_dict = Plant_name(plant_name)
-            return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
-
+            if plant_image != None:
+                return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     if form.validate_on_submit():
         file = form.file.data
         result = process_uploaded_image(file)
         plant_image, plant_data_dict = Plant_name(result)
-        return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
+        if plant_image != None:
+            return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     return render_template('home.html', form=form)
 
 @app.route("/")
@@ -170,12 +171,15 @@ def logout():
         return redirect("/")
 
 def Plant_name(plant_name):
-    plant = Plant_image(name=plant_name)
-    plant_image = plant.image()
     data = ChatGPT(name=plant_name)
-    plant_data = data.info()
-    plant_data_dict = json.loads(plant_data)
-    return plant_image,plant_data_dict
+    if(data.is_plant() == "True"):
+        plant = Plant_image(name=plant_name)
+        plant_image = plant.image()
+        plant_data = data.info()
+        plant_data_dict = json.loads(plant_data)
+        return plant_image,plant_data_dict
+    else:
+        return None,None
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)
