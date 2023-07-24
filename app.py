@@ -3,6 +3,7 @@ import requests
 import random
 import re
 import json
+from datetime import datetime
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -59,7 +60,9 @@ class Plants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     plnt_name = db.Column(db.String(20), nullable=False)
     # plant_sciname = db.Column(db.String(20), nullable=False)
+    plnt_care = db.Column(db.json, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     def __repr__(self):
         return f"Plants('{self.plnt_name}')"
@@ -192,7 +195,10 @@ def portfolio():
 def add_to_portfolio():
     plant_name = request.json.get('plant_name')
     if plant_name:
-        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
+        plant = ChatGPT(plant_name)
+        plant_care = plant.careCalendar()
+        date = datetime.now()
+        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date)
         db.session.add(new_plant)
         db.session.commit()
         return {"message": "Plant added successfully!"}, 200
@@ -203,3 +209,4 @@ def add_to_portfolio():
     
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)
+    
