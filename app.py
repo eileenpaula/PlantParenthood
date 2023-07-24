@@ -62,12 +62,12 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if user is not None:
             raise ValidationError('Please use a different username.')
-        
+
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user is not None:
             raise ValidationError('Please use a different email address.')
-        
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -110,8 +110,9 @@ def process_uploaded_image(file):
 def home_page():
     form = UploadFileForm()
     if request.method == 'POST':
-        if(request.form.get("search") is not None):
-            plant_name = request.form.get("search")
+        search_query = request.form.get("search")
+        if search_query:
+            plant_name = search_query
             plant_image, plant_data_dict = Plant_name(plant_name)
             return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
 
@@ -143,7 +144,7 @@ def register():
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('home_page'))
-    
+
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -175,6 +176,6 @@ def Plant_name(plant_name):
     plant_data = data.info()
     plant_data_dict = json.loads(plant_data)
     return plant_image,plant_data_dict
-    
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)

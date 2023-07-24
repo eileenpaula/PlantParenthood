@@ -2,7 +2,8 @@ import requests
 import pprint
 import os
 
-
+api_key = 'acc_584bfdcc678f660'
+api_secret = 'efc88efd77cbe8382eb82075ee2ffbdb'
 
 class Image_Finder:
 
