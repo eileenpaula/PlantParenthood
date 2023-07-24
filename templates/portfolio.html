@@ -14,20 +14,32 @@
             <li>
                 {% for plant in allplants %}
                     <div class="box">
-                        <h3>{{plant.plnt_name}}</h3>
-                        <!-- <img class="left-image" src={{image}} alt="Left Image"> -->
-                        <div class="flex">
-                            <form action="{{ url_for('portfolio') }}" method="POST">
-                                <input type="text" class="flex-child" name="rename" value="rename" autofocus placeholder="Rename">
-                                <input type="hidden" class="flex-child" name="delete"  value="delete">
-                                <input type="submit" class="flex-child" value="Submit">
-                            </form>
-                        </div>
+                        <h3 id="plant_name_{{plant.id}}">{{plant.plnt_name}}</h3>
+                        <form class="rename-form">
+                            <input type="text" class="rename-field" name="rename" placeholder="Rename" data-plant-id="{{plant.id}}">
+                            <input type="submit" value="Submit">
+                        </form>
+                        <form action="{{ url_for('portfolio') }}" method="POST">
+                            <input type="hidden" name="delete" value="{{plant.id}}">
+                            <input type="submit" value="Delete">
+                        </form>
                     </div>
                 {% endfor %}
             </li>
         {% endif %}
     </ul>
 </div>
+<script>
+    $(".rename-form").on("submit", function(e) {
+        e.preventDefault();
+        let new_name = $(this).find('.rename-field').val();
+        let plant_id = $(this).find('.rename-field').data('plant-id');
+        $.post('/rename_plant', {plant_id: plant_id, new_name: new_name}, function(data) {
+            if(data.status === 'success') {
+                $('#plant_name_' + plant_id).text(new_name);
+            }
+        });
+    });
+</script>
 {% endblock %}
 

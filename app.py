@@ -3,7 +3,7 @@ import requests
 import random
 import re
 import json
-from flask import Flask, render_template, url_for, flash, redirect, session, request
+from flask import Flask, render_template, url_for, flash, redirect, session, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_session import Session
@@ -13,7 +13,8 @@ from flask_cors import CORS
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
 from flask_behind_proxy import FlaskBehindProxy
-from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import current_user
 from datetime import datetime
 from chatgpt import ChatGPT
 from trefle_api import Plant_image
@@ -54,7 +55,8 @@ class User(UserMixin, db.Model):
     
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    # return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 class Plants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -67,12 +69,6 @@ class Plants(db.Model):
     def __repr__(self):
         return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}')"
         # return f"Plants('{self.plnt_name}')"
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
 
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
@@ -172,15 +168,22 @@ def logout():
 @login_required
 def portfolio():
     # Rename plant
-    if request.method == 'POST':
-        newname = request.form.get('rename')
-        if newname is not None:
-            renamed = Plants(plnt_name=newname, user_id=current_user.id)
-            db.session.add(renamed)
-            db.session.commit()
+    # if request.method == 'POST':
+    #     newname = request.form.get('rename')
+    #     if newname:
+    #         plant_to_rename = Plants.query.filter_by(plnt_name=newname, user_id=current_user.id).first()
+    #         if plant_to_rename:
+    #             plant_to_rename.plnt_name = newname
+    #             db.session.commit()
+    #             flash(f'Plant has been renamed to {newname}!', 'success')
+    #         else:
+    #             flash('Plant not found.', 'danger')
+            # renamed = Plants(plnt_name=newname, user_id=current_user.id)
+            # db.session.add(renamed)
+            # db.session.commit()
             
     # Delete plant
-    elif request.method == 'GET':
+    if request.method == 'GET':
         if(request.form.get("delete") is not None):
             plant_to_del = Plants.query.filter_by(user_id=current_user.id)
             db.session.delete(plant_to_del)
@@ -200,12 +203,28 @@ def add_to_portfolio():
         plant_care = plant_info.careCalendar()
         date = datetime.now()
         new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date)
-        # new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
         db.session.add(new_plant)
         db.session.commit()
         return {"message": "Plant added successfully!"}, 200
     else:
         return {"message": "Error: No plant name provided."}, 400
+    
+@app.route("/rename_plant", methods=['POST'])
+@login_required
+def rename_plant():
+    plant_id = request.form.get('plant_id')
+    new_name = request.form.get('new_name')
+    if plant_id and new_name:
+        plant_to_rename = db.session.get(Plants, plant_id)
+        if plant_to_rename and (plant_to_rename.user_id == current_user.id):
+            plant_to_rename.plnt_name = new_name
+            db.session.commit()
+            flash(f'Plant has been renamed to {new_name}!', 'success')
+            return jsonify(status='success')
+        else:
+            flash('Plant not found.', 'danger')
+    return jsonify(status='error')
+
 
 
 
