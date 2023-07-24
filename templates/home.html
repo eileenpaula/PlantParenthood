@@ -72,6 +72,9 @@
         <input type="text" name="search" placeholder="Enter Plant Type...">
         <input type="submit" class="btn btn-primary search-button" value="Search">
     </form>
+    {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+    {% endif %}
 
 
     <p>If you're not sure what kind of child you have, you can show us a pic!</p>
