@@ -16,7 +16,8 @@ from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from datetime import datetime
 from chatgpt import ChatGPT
-from trefle_api import Plant_image
+from splash_api import Plant_image
+from image_rec import Image_Finder
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
@@ -25,6 +26,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config['WTF_CSRF_ENABLED'] = True
 app.config['SECRET_KEY'] = 'sk-QI3n64b9a63da2fa31627'
+app.config['UPLOAD_FOLDER'] = 'static/files'
 Session(app)
 CORS(app)
 # Database
@@ -60,10 +62,11 @@ class Plants(db.Model):
     plnt_name = db.Column(db.String(20), nullable=False)
     plnt_care = db.Column(db.JSON, nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    image = db.Column(db.String(255), nullable=False)
     # plant_sciname = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     def _repr_(self):
-        return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}')"
+        return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}', '{self.image}'')"
         # return f"Plants('{self.plnt_name}')"
 
 
@@ -117,12 +120,8 @@ def process_uploaded_image(file):
     # Set the filename to "image" and keep the original file extension
     filename = 'image' + os.path.splitext(file.filename)[1]
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
-    # Create an instance of the Image_Finder class
     image_finder = Image_Finder()
-    # Call the image() method to process the uploaded image
     result = image_finder.image()
-
     return result
 
 @app.route("/home", methods=['GET', 'POST'])
@@ -213,10 +212,12 @@ def portfolio():
 def add_to_portfolio():
     plant_name = request.json.get('plant_name')
     if plant_name:
+        plant_image = Plant_image(name=plant_name)
+        img = plant_image.image()
         plant_info = ChatGPT(plant_name)
         plant_care = plant_info.careCalendar()
         date = datetime.now()
-        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date)
+        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date, image = img)
         # new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
         db.session.add(new_plant)
         db.session.commit()
@@ -234,6 +235,8 @@ def Plant_name(plant_name):
         return plant_image,plant_data_dict
     else:
         return None,None
+
+
 
 
 if __name__ == '__main__':

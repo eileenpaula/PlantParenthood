@@ -1,32 +1,50 @@
-{% extends "layoutt.html" %}
+{% extends "layoutt.html" %} 
 
-{% block title %}
-    Plant Portfolio
-{% endblock %}
+{% block title %} Plant Portfolio {% endblock %} 
 
-{% block content %}
-<div >
-    <h1 style = "color:#0077B6">Your Children!</h1>
-    <ul>
-        {% if allplants|length == 0 %}
-            <p>No plants in the portfolio!</p>
-        {% else %}
-            <li>
-                {% for plant in allplants %}
-                    <div class="box">
-                        <h3>{{plant.plnt_name}}</h3>
-                        <!-- <img class="left-image" src={{image}} alt="Left Image"> -->
-                        <div class="flex">
-                            <form action="{{ url_for('portfolio') }}" method="POST">
-                                <input type="text" class="flex-child" name="rename" value="rename" autofocus placeholder="Rename">
-                                <input type="hidden" class="flex-child" name="delete"  value="delete">
-                                <input type="submit" class="flex-child" value="Submit">
-                            </form>
-                        </div>
+{% block content %} 
+<style>
+    body {
+        background-image: url('https://zippermiranda-capitalcactus.codio.io/PlantParenthood/images/200w-4.webp');
+        /*will be changing this*/
+        /*background-size: cover;
+        /*background-repeat: no-repeat; 
+        background-position: center center;*/
+        color: white; 
+    }
+
+    center {
+        align-items: center;
+        font-family: 'Shadows Into Light';
+        font-size: 20px;
+        color: black;
+        text-shadow: 2px 2px 6px white;
+    }
+
+    /* Styles for the box class */
+    .box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 350px; /* Set the width of the box */
+        height: 250px; /* Set the height of the box */
+        background-color: white;
+    }
+</style>
+<center>
+    <div>
+        <h1>Your *Planned* Children :) </h1>
+        <ul> {% if allplants|length == 0 %} <p>No plants in the portfolio!</p> {% else %} <li> {% for plant in allplants %} <div class="box">
+                    <h3>{{plant.plnt_name}}</h3>
+                    <img src= "{{ plant.image }}" alt="Plant Image" style="width: 200px; height: 150px;">
+                    <div class="flex">
+                        <form action="{{ url_for('portfolio') }}" method="POST">
+                            <input type="text" class="flex-child" name="rename" value="rename" autofocus placeholder="Rename">
+                            <input type="hidden" class="flex-child" name="delete" value="delete">
+                            <input type="submit" class="flex-child" value="Submit">
+                        </form>
                     </div>
-                {% endfor %}
-            </li>
-        {% endif %}
-    </ul>
-</div>
+                </div> {% endfor %} </li> {% endif %} </ul>
+    </div>
+</center> 
 {% endblock %}
