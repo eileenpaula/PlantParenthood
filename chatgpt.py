@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 import openai
-openai.organization = "org-a7U4QMb1bOxH31funt61Aon9"
+openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
 openai.api_key = os.getenv('gpt_api_key')
 
 class ChatGPT:

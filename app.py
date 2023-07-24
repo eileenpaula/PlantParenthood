@@ -62,7 +62,7 @@ class Plants(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f"Plants('{self.plant_name}')"
+        return f"Plants('{self.plnt_name}')"
 
 
 @login_manager.user_loader
@@ -167,6 +167,7 @@ def logout():
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
+    # Rename plant
     if request.method == 'POST':
         newname = request.form.get('rename')
         if newname is not None:
@@ -174,16 +175,18 @@ def portfolio():
             db.session.add(renamed)
             db.session.commit()
             
+    # Delete plant
     elif request.method == 'GET':
         if(request.form.get("delete") is not None):
             plant_to_del = Plants.query.filter_by(user_id=current_user.id)
             db.session.delete(plant_to_del)
             db.session.commit()
             flash("Plant deleted successfully!")
-
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
+    print(allplants)
     return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
 
+# Add plant to portfolio
 @app.route('/add_to_portfolio', methods=['POST'])
 @login_required
 def add_to_portfolio():

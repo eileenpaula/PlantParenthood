@@ -157,6 +157,7 @@ font-size: 36px;
       .then(data => {
           if (data.message) {
               alert(data.message);
+              location.reload();
           }
       })
       .catch((error) => {
