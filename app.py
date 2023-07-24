@@ -14,6 +14,7 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from datetime import datetime
 from chatgpt import ChatGPT
 from trefle_api import Plant_image
 
@@ -58,11 +59,14 @@ def load_user(user_id):
 class Plants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     plnt_name = db.Column(db.String(20), nullable=False)
+    plnt_care = db.Column(db.JSON, nullable=False)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     # plant_sciname = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
-        return f"Plants('{self.plnt_name}')"
+        return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}')"
+        # return f"Plants('{self.plnt_name}')"
 
 
 @login_manager.user_loader
@@ -112,9 +116,9 @@ def home_page():
             plant_data = data.info()
             plant_data_dict = json.loads(plant_data)
 
-            dbplant_names = Plants(plnt_name=plant_name, user_id=current_user.id)
-            db.session.add(dbplant_names)
-            db.session.commit()
+            # dbplant_names = Plants(plnt_name=plant_name, user_id=current_user.id)
+            # db.session.add(dbplant_names)
+            # db.session.commit()
             return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     return render_template('home.html')
 
@@ -192,7 +196,11 @@ def portfolio():
 def add_to_portfolio():
     plant_name = request.json.get('plant_name')
     if plant_name:
-        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
+        plant_info = ChatGPT(plant_name)
+        plant_care = plant_info.careCalendar()
+        date = datetime.now()
+        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date)
+        # new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
         db.session.add(new_plant)
         db.session.commit()
         return {"message": "Plant added successfully!"}, 200
