@@ -30,11 +30,11 @@ class Image_Finder:
         return None
 
 
-# Create an instance of the Image_Finder class
-image_finder = Image_Finder()
+# # Create an instance of the Image_Finder class
+# image_finder = Image_Finder()
 
-# Call the image() method to get the tag
-tag = image_finder.image()
+# # Call the image() method to get the tag
+# tag = image_finder.image()
 
-# Print the tag
-#print(tag)
+# # Print the tag
+# print(tag)

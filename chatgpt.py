@@ -6,7 +6,7 @@ import os
 import openai
 openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
 #openai.api_key1 = os.environ.get('gpt_api_key')
-openai.api_key= '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'
+openai.api_key= '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'
 
 class ChatGPT:
 

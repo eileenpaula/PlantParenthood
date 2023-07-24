@@ -5,7 +5,7 @@ load_dotenv()
 # response = requests.get('https://api.unsplash.com/search/photos?page=1&query=sunflower&client_id=2THIa3M8t-GT_nc2WpNG9IeQtjjY_P32rDJM36neBOg')
 # pprint.pprint(response.json())
 import os
-api_key = os.environ.get('splash_key')
+api_key = '2THIa3M8t-GT_nc2WpNG9IeQtjjY_P32rDJM36neBOg'
 
 
 class Plant_image:
