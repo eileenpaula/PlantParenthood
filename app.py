@@ -208,6 +208,6 @@ def add_to_portfolio():
         return {"message": "Error: No plant name provided."}, 400
 
 
-    
+
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=5001)
