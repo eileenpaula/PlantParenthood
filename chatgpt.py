@@ -6,7 +6,7 @@ import os
 import openai
 openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
 #openai.api_key1 = os.environ.get('gpt_api_key')
-openai.api_key= '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'
+openai.api_key= os.environ.get('gpt_api_key')
 
 class ChatGPT:
 
@@ -20,7 +20,7 @@ class ChatGPT:
             messages=[
                 {
                     "role": "system",
-                    "content": "You will be provided with a plant name, your task is to generate a dictionary with the integer number as keys of a real-life 30-days calender starting with today's date with insturctions on how to take care of the plant. Assume the plant is already grown"
+                    "content": "You will be provided with a plant name, your task is to generate a dictionary with the integer number as keys and the value being a real life 7-day calender on how to take car of the plant."
                 },
                 {
                     "role": "user",
