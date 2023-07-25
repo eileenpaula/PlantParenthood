@@ -108,9 +108,16 @@ font-size: 36px;
     margin-left: 5px; /* Optional: Add some spacing between the toggle button and other elements */
 }
 
-.navbar .nav-link:hover {
-  box-shadow: 0 5px 10px greenyellow;
-  color: red;
-  transition: 0.5s;
+.navbar a {
+      color: white; /* Set the text color for the navbar links */
 }
 
+.nav-link:hover {
+  box-shadow: 0 5px 10px greenyellow;
+  color: white;
+  transition: 0.5s;
+}
+.navbar {
+  /* Set the text color for the navbar links */
+ 
+}
