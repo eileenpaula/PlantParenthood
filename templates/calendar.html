@@ -20,39 +20,23 @@
                 <li><a href="#">Logout</a></li>
             </ul>
         </nav>
-        <div class="checklist">
-            <div class="checklist-item">
-                <input type="checkbox" id="plant1" />
-                <label for="plant1"></label>
-                <p>Plant 1</p>
-            </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="plant2" />
-                <label for="plant2"></label>
-                <p>Plant 2</p>
-            </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="plant3" />
-                <label for="plant3"></label>
-                <p>Plant 3</p>
-            </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="plant4" />
-                <label for="plant4"></label>
-                <p>Plant 4</p>
-            </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="plant5" />
-                <label for="plant5"></label>
-                <p>Plant 5</p>
-            </div>
-            <div class="checklist-item">
-                <input type="checkbox" id="plant6" />
-                <label for="plant6"></label>
-                <p>Plant 6</p>
-            </div>
-        </div>
         
+        <div class="checklist">
+            <form method="post" action="/process_form">
+                <div class="checklist-container">
+                    {% for plant in plants %}
+                    <div class="checklist-item">
+                        <input type="checkbox" id="{{ plant.id }}" name="items" value = "{{plant.id}}" />
+                        <label for="{{ plant.id }}"></label>
+                        <p>{{ plant.plnt_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    
+
     </body>
     
     <body>
@@ -64,17 +48,46 @@
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar
             (calendarEl, {
+
+
+                views: {
+                    listDay: { buttonText: 'list day' },
+                    listWeek: { buttonText: 'list week' },
+                },
+                headerToolbar: {
+                    start: 'title',
+                    end: 'today dayGridMonth,listWeek prev,next'
+                },
+                selectable: true,
+                dateClick: function(info) {
+                    calendar.changeView('listDay', info.dateStr);
+                },
+                eventDidMount: function(info) {
+                    var tooltip = new Tooltip(info.el, {
+                        title: info.event.extendedProps.description,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                },
                 events : [
                     {% for event in events %}
-                    {
-                        title : '{{event.plant}}',
-                        description: '{{event.todo}}',
-                        start : '{{event.date}}',
-                    },
+                        {% if event.id|string in checked_items %}
+                            {
+                                id : '{{event.id}}',
+                                title : '{{event.plnt_name}}',
+                                description: '{{event.plnt_care}}',
+                                start : '{{event.date_added}}',
+                                startRecur: '{{event.date_added}}',
+                                daysOfWeek: [{{event.day_of_week}}]
+                            },
+                        {% endif %}
                     {% endfor %}
                 ],
 
-                eventColor: 'green'
+                eventColor: 'green',
+
+                dayMaxEvents: true, 
             });
 
             calendar.on('eventClick', function(info) {
