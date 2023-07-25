@@ -14,7 +14,7 @@ from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo, InputRequired
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
-from datetime import datetime
+from datetime import datetime, timedelta
 from chatgpt import ChatGPT
 from splash_api import Plant_image
 from image_rec import Image_Finder
