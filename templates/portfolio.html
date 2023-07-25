@@ -1,0 +1,63 @@
+{% extends "layoutt.html" %}
+
+{% block title %} Plant Portfolio {% endblock %}
+
+{% block content %}
+<style>
+    body {
+        background-image: url('https://zippermiranda-capitalcactus.codio.io/PlantParenthood/images/200w-4.webp');
+        /*will be changing this*/
+        /*background-size: cover;
+        /*background-repeat: no-repeat;
+        background-position: center center;*/
+        color: white;
+    }
+
+    center {
+        align-items: center;
+        font-family: 'Shadows Into Light';
+        font-size: 20px;
+        color: black;
+        text-shadow: 2px 2px 6px white;
+    }
+
+    /* Styles for the box class */
+    .box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        margin-bottom: 10px;
+        width: 350px; /* Set the width of the box */
+        height: 280px; /* Set the height of the box */
+        background-color: white;
+    }
+</style>
+<center>
+    <div>
+        <h1>Your *Planned* Children :) </h1>
+        <ul> {% if allplants|length == 0 %} <p>No plants in the portfolio!</p> {% else %} <li> {% for plant in allplants %} <div class="box">
+                    <h3>{{plant.plnt_name}}</h3>
+                    <img src= "{{ plant.image }}" alt="Plant Image" style="width: 200px; height: 150px;">
+                        <form class="rename-form">
+                            <input type="text" class="rename-field" name="rename" placeholder="Rename" data-plant-id="{{plant.id}}">
+                            <input type="submit" value="Submit">
+                        </form>
+                        <form action="{{ url_for('portfolio') }}" method="POST">
+                            <input type="hidden" name="delete" value="{{plant.id}}">
+                            <input type="submit" value="Delete">
+                        </form>
+                </div> {% endfor %} </li> {% endif %} </ul>
+    </div>
+</center>
+<script>
+    $(".rename-form").on("submit", function(e) {
+        e.preventDefault();
+        let new_name = $(this).find('.rename-field').val();
+        let plant_id = $(this).find('.rename-field').data('plant-id');
+        $.post('/rename_plant', {plant_id: plant_id, new_name: new_name}, function(data) {
+            if(data.status === 'success') {
+                $('#plant_name_' + plant_id).text(new_name);
+            }
+        });
+    });
+</script>
+{% endblock %}
