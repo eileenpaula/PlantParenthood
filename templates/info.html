@@ -17,37 +17,45 @@
     <link rel="stylesheet" type="text/css" href="../static/style.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-        }
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden; /* Add this to prevent scrollbars */
+    }
 
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100vh;
-        }
+    .container {
 
-        .left-image,
-        .right-image {
-            width: 50%;
-            height: 100vh;
-            object-fit: cover;
-            position: relative;
-        }
+        display: flex;
+        padding-top: 56.25%;
+        align-items: center;
+        height: 100vh;
+
+    }
+
+    .right-image {
+        width: 100%; /* Set the width of the image to cover the screen */
+        height: 130%;
+        position: absolute;
+        top: 0;
+        display: flex;
+        left: 0;
+        margin-top: 55px;
+
+    }
 
         .overlay {
+            margin-top: 55px;
             position: absolute;
             top: 0;
-            left: 50%;
-            width: 50%;
-            height: 100%;
+            left: 0;
+            width: 100%;
+            height: 130%;
             background-color: rgba(0, 0, 0, 0.5);
             /* Adjust the opacity here (0.5 means 50% transparent) */
             display: flex;
             flex-direction: column;
-            /* Add this to make each paragraph appear on a separate line */
+            /* Makes each paragraph appear on a separate line */
             justify-content: center;
             align-items: center;
             color: #FFFFFF;
@@ -55,90 +63,27 @@
         }
 
         p {
-            text-align: left;
+            text-align: center;
+             margin: 10px 0;
+            margin-bottom: 10px;
         }
 
-        .switch {
-            position: relative;
+
+        .portfolio-button {
             display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .slider {
-            position: absolute;
+            background-color: green;
+            color: white;
+            padding: 8px 20px;
+            border: none;
             cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
+            border-radius: 16px;
         }
 
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
+        /* Optional: Style the button when hovering over it */
+        .portfolio-button:hover {
+            background-color: dark green;
         }
 
-        input:checked+.slider {
-            background-color: #2196F3;
-        }
-
-        input:focus+.slider {
-            box-shadow: 0 0 1px #2196F3;
-        }
-
-        input:checked+.slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-        }
-
-        /* Rounded sliders */
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        .toggle-label {
-            font-size: 36px;
-            margin-right: 10px;
-        }
-
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            /* Align items vertically centered */
-            margin-top: 10px;
-            /* Optional: Add some spacing between the text and the toggle button */
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-            margin-left: 5px;
-            /* Optional: Add some spacing between the toggle button and other elements */
-        }
     </style>
 </head>
 
@@ -165,23 +110,20 @@
             </ul>
         </div>
     </nav>
+<!--    {{image}}-->
     <div class="container">
-        <img class="left-image" src={{image}} alt="Left Image">
-        <img class="right-image" src={{image}} alt="Right Image">
+        <img class="right-image" src=plant.jpg alt="Main Image">
         <div class="overlay">
-            <h2>Plant name: {{ plant_data["name"] }}</h2>
-            <p>Plant Description:{{ plant_data["description"] }}</p><br>
+            <h2>Plant name:  {{ plant_data["name"] }}</h2>
+            <p>Plant Description: {{ plant_data["description"] }}</p><br>
             <p>Growing Conditions: {{ plant_data['growing_conditions'] }}</p><br>
-            <p>Plant Type: {{ plant_data.plant_type }}</p><br>
-            <p>Climate: {{ plant_data.climate }}</p><br>
-            <p>Soil Type: {{ plant_data.soil_type }}</p><br>
-            <p>Fun Facts: {{ plant_data["fun_facts"][0] }}</p>
+            <p>Plant Type:  {{ plant_data.plant_type }}</p><br>
+            <p>Climate:  {{ plant_data.climate }}</p><br>
+            <p>Soil Type:  {{ plant_data.soil_type }}</p><br>
+            <p>Fun Facts:  {{ plant_data["fun_facts"][0] }}</p>
             <div class="toggle-container">
                 <label class="toggle-label">Add to Portfolio:</label>
-                <label class="switch">
-                    <input type="checkbox" id="portfolioToggle" onclick='addToPortfolio("{{plant_data.name|e}}")'>
-                    <span class="slider round"></span>
-                </label>
+                <button class="portfolio-button" onclick='addToPortfolio("{{plant_data.name|e}}")'>Add</button>
             </div>
         </div>
     </div>
