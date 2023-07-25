@@ -194,16 +194,19 @@ def Plant_name(plant_name):
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
-    if request.method == 'GET':
-        if(request.form.get("delete") is not None):
-            plant_to_del = Plants.query.filter_by(user_id=current_user.id)
-            db.session.delete(plant_to_del)
-            db.session.commit()
-            flash("Plant deleted successfully!")
+    if request.method == 'POST':
+        plant_id = request.form.get('plant_id')
+        if request.form.get("delete") and plant_id:
+            currplant = db.session.get(Plants, plant_id)
+            if currplant and (currplant.user_id == current_user.id):
+                db.session.delete(currplant)
+                db.session.commit()
+                flash(f'Plant deleted successfully!', 'success')
+            else:
+                flash('Plant not found.', 'danger')
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
     print(allplants)
-    return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
-
+    return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants=allplants)
 
 # Add plant to portfolio
 @app.route('/add_to_portfolio', methods=['POST'])
@@ -236,7 +239,7 @@ def rename_plant():
             plant_to_rename.plnt_name = new_name
             db.session.commit()
             flash(f'Plant has been renamed to {new_name}!', 'success')
-            return redirect("/portfolio")
+            return redirect(url_for('portfolio'))
         else:
             flash('Plant not found.', 'danger')
     #return jsonify(status='error')

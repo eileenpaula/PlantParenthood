@@ -35,15 +35,15 @@
     <div>
         <h1>Your *Planned* Children :) </h1>
         <ul> {% if allplants|length == 0 %} <p>No plants in the portfolio!</p> {% else %} <li> {% for plant in allplants %} <div class="box">
-                    <h3>{{plant.plnt_name}}</h3>
+                    <h3 id="plant_name_{{plant.id}}">{{plant.plnt_name}}</h3>
                     <img src= "{{ plant.image }}" alt="Plant Image" style="width: 200px; height: 150px;">
                         <form class="rename-form">
                             <input type="text" class="rename-field" name="rename" placeholder="Rename" data-plant-id="{{plant.id}}">
                             <input type="submit" value="Submit">
                         </form>
                         <form action="{{ url_for('portfolio') }}" method="POST">
-                            <input type="hidden" name="delete" value="{{plant.id}}">
-                            <input type="submit" value="Delete">
+                            <input type="hidden" name="plant_id" value="{{plant.id}}">
+                            <input type="submit" name="delete" value="delete">
                         </form>
                 </div> {% endfor %} </li> {% endif %} </ul>
     </div>
