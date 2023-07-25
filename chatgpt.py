@@ -20,7 +20,7 @@ class ChatGPT:
             messages=[
                 {
                     "role": "system",
-                    "content": "You will be provided with a plant name, your task is to generate a dictionary with the integer number as keys and the value being a real life 7-day calender on how to take car of the plant."
+                    "content": "You will be provided with a plant name, your task is to generate a dictionary with the integer number as keys and the value being a real life 7-day calender on how to take care of the plant. Assume this plant is already grown. The value must demonstrate a task that can be done once a week. Avoid mentioning daily tasks or the term once a week."
                 },
                 {
                     "role": "user",
