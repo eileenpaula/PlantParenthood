@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8' />
+        <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+        <script src="https://unpkg.com/popper.js/dist/umd/popper.min.js"></script>
+        <script src="https://unpkg.com/tooltip.js/dist/umd/tooltip.min.js"></script>
+        <script src="https://static.cloudflareinsights.com/beacon.min.js"></script>
+        <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' />
+        <link href="{{ url_for('static', filename='calendar.css') }}" rel="stylesheet" type="text/css" />
+    </head>
+    
+    <body>
+        <nav>
+            <h1> Plant Parenthood </h1>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">Calendar</a></li>
+                <li><a href="#">Portfolio</a></li>
+                <li><a href="#">Logout</a></li>
+            </ul>
+        </nav>
+        
+        <div class="checklist">
+            <form method="post" action="/process_form">
+                <div class="checklist-container">
+                    {% for plant in plants %}
+                    <div class="checklist-item">
+                        <input type="checkbox" id="{{ plant.id }}" name="items" value = "{{plant.id}}" />
+                        <label for="{{ plant.id }}"></label>
+                        <p>{{ plant.plnt_name }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    
+
+    </body>
+    
+    <body>
+        <div id='calendar'></div>
+    </body>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let calendarEl = document.getElementById('calendar');
+            let calendar = new FullCalendar.Calendar
+            (calendarEl, {
+
+
+                views: {
+                    listDay: { buttonText: 'list day' },
+                    listWeek: { buttonText: 'list week' },
+                },
+                headerToolbar: {
+                    start: 'title',
+                    end: 'today dayGridMonth,listWeek prev,next'
+                },
+                selectable: true,
+                dateClick: function(info) {
+                    calendar.changeView('listDay', info.dateStr);
+                },
+                eventDidMount: function(info) {
+                    var tooltip = new Tooltip(info.el, {
+                        title: info.event.extendedProps.description,
+                        placement: 'top',
+                        trigger: 'hover',
+                        container: 'body'
+                    });
+                },
+                events : [
+                    {% for event in events %}
+                        {% if event.id|string in checked_items %}
+                            {
+                                id : '{{event.id}}',
+                                title : '{{event.plnt_name}}',
+                                description: '{{event.plnt_care}}',
+                                start : '{{event.date_added}}',
+                                startRecur: '{{event.date_added}}',
+                                daysOfWeek: [{{event.day_of_week}}]
+                            },
+                        {% endif %}
+                    {% endfor %}
+                ],
+
+                eventColor: 'green',
+
+                dayMaxEvents: true, 
+            });
+
+            calendar.on('eventClick', function(info) {
+                alert(info.event.title + '\n' + info.event.extendedProps.description);
+            });
+
+            calendar.render()
+        });
+    </script>
+    
+</html>
+
+
