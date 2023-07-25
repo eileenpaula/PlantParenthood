@@ -3,7 +3,7 @@ import requests
 import random
 import re
 import json
-from flask import Flask, render_template, url_for, flash, redirect, session, request
+from flask import Flask, render_template, url_for, flash, redirect, session, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_session import Session
@@ -239,10 +239,11 @@ def rename_plant():
             plant_to_rename.plnt_name = new_name
             db.session.commit()
             flash(f'Plant has been renamed to {new_name}!', 'success')
-            return redirect(url_for('portfolio'))
+            return jsonify(status='success')
         else:
             flash('Plant not found.', 'danger')
-    #return jsonify(status='error')
+    
+    return jsonify(status = 'error')
 
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0", port=5001)
