@@ -245,5 +245,39 @@ def rename_plant():
     
     return jsonify(status = 'error')
 
+def get_data(plants_array):
+    plant_data = Plants.query.all()
+    for plant in plant_data:
+        plnt_care_arr = plant.plnt_care.split('"')[1:-1:2]
+        for n, day in enumerate(plnt_care_arr):
+            date = plant.date_added
+            date += timedelta(n)
+            plant_dict = {
+                'id': plant.id,
+                'plnt_name': plant.plnt_name,
+                'plnt_care': day,
+                'date_added': date.strftime('%Y-%m-%d'),
+                'day_of_week' : (date.weekday()+1)%7
+            }
+            plants_array.append(plant_dict)
+
+
+checked_items = []
+
+@app.route("/calendar")
+def calendar():
+    plants = Plants.query.all()
+    plants_array = []
+    get_data(plants_array)
+    return render_template('calendar.html', events=plants_array, plants = plants, checked_items=checked_items)
+
+
+@app.route('/process_form', methods=['POST'])
+def process_form():
+    global checked_items
+    items = request.form.getlist('items')
+    checked_items = items
+    return redirect('/calendar')
+
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0", port=5001)
