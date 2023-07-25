@@ -2,6 +2,7 @@ import os
 import requests
 import random
 import re
+import sqlite3
 import json
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
@@ -9,15 +10,16 @@ from flask_migrate import Migrate
 from flask_session import Session
 from flask_cors import CORS
 from flask_login import login_user
+from datetime import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo, InputRequired
 from flask_behind_proxy import FlaskBehindProxy
-from datetime import datetime
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
 from chatgpt import ChatGPT
 from splash_api import Plant_image
 from image_rec import Image_Finder
+
 
 app = Flask(__name__)
 proxied = FlaskBehindProxy(app)
@@ -31,11 +33,12 @@ app.config['UPLOAD_FOLDER'] = 'static/files'
 Session(app)
 CORS(app)
 
+
+# Function to establish database connection
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-
 
 # Flask-Login
 login_manager = LoginManager(app)
@@ -52,51 +55,20 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 
 class Plants(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     plnt_name = db.Column(db.String(20), nullable=False)
     plnt_care = db.Column(db.JSON, nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    # plant_sciname = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    def _repr_(self):
+
+    def __repr__(self):
         return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}')"
-        # return f"Plants('{self.plnt_name}')"
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
-
-class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different username.')
-
-    def validate_email(self, email):
-        user = User.query.filter_by(email=email.data).first()
-        if user is not None:
-            raise ValidationError('Please use a different email address.')
-
-class LoginForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-    password = PasswordField('Password', validators=[DataRequired()])
-    submit = SubmitField('Log In')
-
-    def validate_username(self, username):
-        user = User.query.filter_by(username=username.data).first()
-        if not user:
-            raise ValidationError('Username does not exist. Create an account')
-
-with app.app_context():
-    db.create_all()
 
 
 def validate_image(form, field):
@@ -122,6 +94,14 @@ def process_uploaded_image(file):
     return result
 
 
+@app.route('/index')
+@app.route('/')
+def index():
+    error = request.args.get('error', None)
+    error_type = request.args.get('error_type', None)
+    return render_template('index.html', error=error, error_type=error_type)
+
+
 
 @app.route("/home", methods=['GET', 'POST'])
 def home_page():
@@ -141,39 +121,45 @@ def home_page():
             return render_template('info.html', plant_data=plant_data_dict, image=plant_image)
     return render_template('home.html', form=form)
 
-@app.route("/")
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+
+        # Check if the username is already in the database
+        user_by_username = User.query.filter_by(username=username).first()
+        if user_by_username:
+            return redirect(url_for('index', error='Username already exists!', error_type='signup'))
+
+        # Check if the email is already in the database
+        user_by_email = User.query.filter_by(email=email).first()
+        if user_by_email:
+            return redirect(url_for('index', error='Email already exists!', error_type='signup'))
+
+        # If the username and email are not in the database, insert the new user
+        new_user = User(username=username, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+
         return redirect(url_for('home_page'))
 
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash(f'Account created for {form.username.data}!', 'success')
+@app.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        # Check if the username and password match the database
+        user = User.query.filter_by(username=username, password=password).first()
+        if not user:
+            return redirect(url_for('index', error='Invalid username or password!', error_type='login'))
+
         login_user(user)
         return redirect(url_for('home_page'))
 
-    return render_template('register.html', title='Register', form=form)
-
-@app.route("/login", methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home_page'))
-
-    form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user and user.password == form.password.data:
-            login_user(user)
-            flash(f'Welcome Back {form.username.data}!', 'success')
-            return redirect(url_for('home_page'))
-        else:
-            flash('Invalid username or password.', 'danger')
-
-    return render_template('login.html', title='Log In', form=form)
 
 
 @app.route("/logout", methods=['GET', 'POST'])
@@ -197,7 +183,6 @@ def Plant_name(plant_name):
         return plant_image,plant_data_dict
     else:
         return None,None
-
 
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
@@ -238,6 +223,5 @@ def add_to_portfolio():
     else:
         return {"message": "Error: No plant name provided."}, 400
 
-
 if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=True)
