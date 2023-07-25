@@ -121,3 +121,26 @@ font-size: 36px;
   /* Set the text color for the navbar links */
  
 }
+
+/* Home white box */
+.row {
+  display:flex;
+}
+
+.div2 {
+  flex: 0 0 auto;  /* fixed width */
+}
+
+/* Actual box */
+
+.wbox {
+  padding:1em;
+  border-radius: 5px;
+  /* margin:1em; */
+  background-color: rgba(255, 255, 255, 0.400)
+}
+.row {
+  width:100%;
+  padding:10em;
+  overflow:hidden;
+}

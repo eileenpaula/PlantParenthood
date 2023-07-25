@@ -64,28 +64,39 @@
         margin-top: 10px;
     }
 </style>
-<center>
-    <h1>Welcome to Plant Parenthood</h1>
-    <h2>Children? In this Economy? Have Plants Instead! </h2>
-    <p> What's Your Child's Species? </p>
-    <form class="search-form" method="post">
-        <input type="text" name="search" placeholder="Enter Plant Type...">
-        <input type="submit" class="btn btn-primary search-button" value="Search">
-    </form>
-    {% if error_message %}
-    <p class="error">{{ error_message }}</p>
-    {% endif %}
 
-
-    <p>If you're not sure what kind of child you have, you can show us a pic!</p>
-        <form method='POST' enctype='multipart/form-data'>
-        {{ form.hidden_tag() }}
-        {{ form.file() }}
-        {{ form.submit() }}
-        {% if form.file.errors %}
-            <p style="color: red;">{{ form.file.errors[0] }}</p>
-        {% endif %}
-    </form>
-</center> 
+<div class="row">
+    <div class="div2">
+        <div class = "wbox">
+      
+            <center>
+            <h1>Welcome to Plant Parenthood</h1>
+            <h2>Children? In this Economy? Have Plants Instead! </h2>
+            <p> What's Your Child's Species? </p>
+            <form class="search-form" method="post">
+                <input type="text" name="search" placeholder="Enter Plant Type...">
+                <input type="submit" class="btn btn-primary search-button" value="Search">
+            </form>
+            {% if error_message %}
+                <p class="error">{{ error_message }}</p>
+            {% endif %}
+        
+        
+            <p>If you're not sure what kind of child you have, you can show us a pic!</p>
+                <form method='POST' enctype='multipart/form-data'>
+                    {{ form.hidden_tag() }}
+                    {{ form.file() }}
+                    {{ form.submit() }}
+                    {% if form.file.errors %}
+                        <p style="color: red;">{{ form.file.errors[0] }}</p>
+                    {% endif %}
+                </form>
+            </center> 
+    
+    
+        </div>
+    </div>
+</div>
+  
 
 {% endblock %}
