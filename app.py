@@ -10,7 +10,7 @@ from flask_session import Session
 from flask_login import login_user
 from flask_wtf import FlaskForm
 from flask_cors import CORS
-from wtforms import StringField, PasswordField, SubmitField, FileField
+from wtforms import StringField, PasswordField, SubmitField, FileField, BooleanField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo, InputRequired
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
@@ -70,6 +70,17 @@ class Plants(db.Model):
     def _repr_(self):
         return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}', '{self.image}'')"
         # return f"Plants('{self.plnt_name}')"
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember Me')
+    submit = SubmitField('Log In')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data).first()
+        if not user:
+            raise ValidationError('Username does not exist. Create an account')
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -153,8 +164,9 @@ def signup():
 
         return redirect(url_for('home_page'))
 
-@app.route('/login', methods=['POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm() 
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -166,6 +178,9 @@ def login():
 
         login_user(user)
         return redirect(url_for('home_page'))
+    return render_template('login.html', form=form)  # Pass the form to the template
+
+
 
 
 
@@ -266,7 +281,7 @@ checked_items = []
 
 @app.route("/calendar")
 def calendar():
-    plants = Plants.query.all()
+    plants = Plants.query.filter_by(user_id=current_user.id).all()
     plants_array = []
     get_data(plants_array)
     return render_template('calendar.html', events=plants_array, plants = plants, checked_items=checked_items)
