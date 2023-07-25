@@ -9,7 +9,7 @@ html {
 }
 
 nav {
-  background-color: #333;
+  background-color: white;
   display: flex;
   align-items: center;
   padding: 10px;
@@ -40,7 +40,7 @@ text-decoration: none;
 }
 
 nav ul li a:hover {
-background-color: #111;
+background-color: darkgreen;
 }
 
 .checklist form .checklist-container{
@@ -57,7 +57,7 @@ background-color: #111;
   border: none;
   outline: none;
   padding: 10px 20px;
-  margin: 3% 10% 0% 10%;
+  margin: 3% 5% 0% 10%;
   cursor: pointer;
   font-size: 16px;
   color: #fff;
@@ -96,12 +96,12 @@ background-color: #111;
   display: block;
   text-align: center;
   line-height: 20px;
-  color: white;
+  color: black;
   font-size: 14px;
 }
 
 .checklist-item p {
-  color: rgb(205, 237, 205);
+  color: black;
   padding-left: 5%;
   font-size: 120%;
 }

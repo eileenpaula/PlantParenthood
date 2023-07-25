@@ -10,6 +10,8 @@
         /*background-size: cover;
         /*background-repeat: no-repeat;
         background-position: center center;*/
+        backdrop-filter: blur(2px); /* Adjust the value to control the intensity of the blur */
+        -webkit-backdrop-filter: blur(2px); /* For Safari support (optional, include if needed) */
         color: white;
     }
 
@@ -33,7 +35,7 @@
 </style>
 <center>
     <div>
-        <h1>Your *Planned* Children :) </h1>
+        <h1>Your *Planned* Plant Children :) </h1>
         <ul> {% if allplants|length == 0 %} <p>No plants in the portfolio!</p> {% else %} <li> {% for plant in allplants %} <div class="box">
                     <h3 id="plant_name_{{plant.id}}">{{plant.plnt_name}}</h3>
                     <img src= "{{ plant.image }}" alt="Plant Image" style="width: 200px; height: 150px;">
