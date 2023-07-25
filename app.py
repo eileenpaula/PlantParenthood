@@ -187,15 +187,7 @@ def logout():
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
-    # Rename plant
-    if request.method == 'POST':
-        newname = request.form.get('rename')
-        if newname is not None:
-            renamed = Plants(plnt_name=newname, user_id=current_user.id)
-            db.session.add(renamed)
-            db.session.commit()
-    # Delete plant
-    elif request.method == 'GET':
+    if request.method == 'GET':
         if(request.form.get("delete") is not None):
             plant_to_del = Plants.query.filter_by(user_id=current_user.id)
             db.session.delete(plant_to_del)
@@ -204,7 +196,6 @@ def portfolio():
     allplants = Plants.query.filter_by(user_id=current_user.id).all()
     print(allplants)
     return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants = allplants)
-
 
 # Add plant to portfolio
 @app.route('/add_to_portfolio', methods=['POST'])
@@ -221,7 +212,8 @@ def add_to_portfolio():
         # new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
         db.session.add(new_plant)
         db.session.commit()
-        return {"message": "Plant added successfully!"}, 200
+        flash("Plant added successfully")
+        #return {"message": "Plant added successfully!"}, 200
     else:
         return {"message": "Error: No plant name provided."}, 400
 
@@ -236,7 +228,21 @@ def Plant_name(plant_name):
     else:
         return None,None
 
-
+@app.route("/rename_plant", methods=['POST'])
+@login_required
+def rename_plant():
+    plant_id = request.form.get('plant_id')
+    new_name = request.form.get('new_name')
+    if plant_id and new_name:
+        plant_to_rename = db.session.get(Plants, plant_id)
+        if plant_to_rename and (plant_to_rename.user_id == current_user.id):
+            plant_to_rename.plnt_name = new_name
+            db.session.commit()
+            flash(f'Plant has been renamed to {new_name}!', 'success')
+            return redirect("/portfolio")
+        else:
+            flash('Plant not found.', 'danger')
+    return jsonify(status='error')
 
 
 if __name__ == '__main__':
