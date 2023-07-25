@@ -22,6 +22,11 @@
         margin: 0;
         padding: 0;
         overflow: hidden; /* Add this to prevent scrollbars */
+        font-family: 'Shadows Into Light';
+    }
+
+    h1, h2, p{
+        font-family: 'Shadows Into Light';
     }
 
     .container {
@@ -88,7 +93,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg" style="background-color: darkgreen; color: white;">
+    <nav class="navbar navbar-expand-lg" style="background-color: darkgreen; color: white; font-family: 'Shadows Into Light'; font-size: 150%;">
         <a class="navbar-brand" href="#">Plant Parenthood</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -102,7 +107,7 @@
                     <a class="nav-link" href="{{ url_for('portfolio') }}">Portfolio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Calendar</a>
+                    <a class="nav-link" href="{{ url_for('calendar') }}">Calendar</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('logout') }}"> Log Out </a>
@@ -112,7 +117,7 @@
     </nav>
 <!--    {{image}}-->
     <div class="container">
-        <img class="right-image" src=plant.jpg alt="Main Image">
+        <img class="right-image" src={{image}} alt="Main Image">
         <div class="overlay">
             <h2>Plant name:  {{ plant_data["name"] }}</h2>
             <p>Plant Description: {{ plant_data["description"] }}</p><br>
