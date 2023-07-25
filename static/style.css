@@ -1,146 +1,146 @@
- body {
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100vh;
-        }
-        .left-image, .right-image {
-            width: 50%;
-            height: 100vh;
-            object-fit: cover;
-            position: relative;
-        }
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 50%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity here (0.5 means 50% transparent) */
-            display: flex;
-            flex-direction: column; /* Add this to make each paragraph appear on a separate line */
-            justify-content: center;
-            align-items: center;
-            color: #FFFFFF;
-            font-size: 16px;
-        }
-       p{
-        text-align: left;
-       }
-              .switch {
+body {
+  margin: 0;
+  padding: 0;
+}
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 100vh;
+}
+.left-image, .right-image {
+  width: 50%;
+  height: 100vh;
+  object-fit: cover;
   position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
+}
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 50%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Adjust the opacity here (0.5 means 50% transparent) */
+  display: flex;
+  flex-direction: column; /* Add this to make each paragraph appear on a separate line */
+  justify-content: center;
+  align-items: center;
+  color: #FFFFFF;
+  font-size: 16px;
+}
+p{
+text-align: left;
+}
+    .switch {
+position: relative;
+display: inline-block;
+width: 60px;
+height: 34px;
 }
 
 .switch input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+opacity: 0;
+width: 0;
+height: 0;
 }
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #ccc;
+-webkit-transition: .4s;
+transition: .4s;
 }
 
 .slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+position: absolute;
+content: "";
+height: 26px;
+width: 26px;
+left: 4px;
+bottom: 4px;
+background-color: white;
+-webkit-transition: .4s;
+transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+background-color: #2196F3;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+box-shadow: 0 0 1px #2196F3;
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+-webkit-transform: translateX(26px);
+-ms-transform: translateX(26px);
+transform: translateX(26px);
 }
 
 /* Rounded sliders */
 .slider.round {
-  border-radius: 34px;
+border-radius: 34px;
 }
 
 .slider.round:before {
-  border-radius: 50%;
+border-radius: 50%;
 }
 .toggle-label{
 font-size: 36px;
- margin-right: 10px;
+margin-right: 10px;
 }
 .toggle-container {
-    display: flex;
-    align-items: center; /* Align items vertically centered */
-    margin-top: 10px; /* Optional: Add some spacing between the text and the toggle button */
+display: flex;
+align-items: center; /* Align items vertically centered */
+margin-top: 10px; /* Optional: Add some spacing between the text and the toggle button */
 }
 
 .switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-    margin-left: 5px; /* Optional: Add some spacing between the toggle button and other elements */
+position: relative;
+display: inline-block;
+width: 60px;
+height: 34px;
+margin-left: 5px; /* Optional: Add some spacing between the toggle button and other elements */
 }
 
 .navbar a {
-      color: white; /* Set the text color for the navbar links */
+color: white; /* Set the text color for the navbar links */
 }
 
 .nav-link:hover {
-  box-shadow: 0 5px 10px greenyellow;
-  color: white;
-  transition: 0.5s;
+box-shadow: 0 5px 10px greenyellow;
+color: white;
+transition: 0.5s;
 }
 .navbar {
-  /* Set the text color for the navbar links */
- 
+/* Set the text color for the navbar links */
+
 }
 
 /* Home white box */
 .row {
-  display:flex;
+display:flex;
 }
 
 .div2 {
-  flex: 0 0 auto;  /* fixed width */
+flex: 0 0 auto;  /* fixed width */
 }
 
 /* Actual box */
 
 .wbox {
-  padding:1em;
-  border-radius: 5px;
-  /* margin:1em; */
-  background-color: rgba(255, 255, 255, 0.400)
+padding:1em;
+border-radius: 5px;
+/* margin:1em; */
+background-color: rgba(255, 255, 255, 0.400)
 }
 .row {
-  width:100%;
-  padding:10em;
-  overflow:hidden;
+width:100%;
+padding:10em;
+overflow:hidden;
 }
