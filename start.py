@@ -2,20 +2,19 @@ import os
 import requests
 import random
 import re
-import sqlite3
 import json
 from flask import Flask, render_template, url_for, flash, redirect, session, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_session import Session
-from flask_cors import CORS
 from flask_login import login_user
-from datetime import datetime
 from flask_wtf import FlaskForm
+from flask_cors import CORS
 from wtforms import StringField, PasswordField, SubmitField, FileField
 from wtforms.validators import ValidationError, DataRequired, Length, Email, EqualTo, InputRequired
 from flask_behind_proxy import FlaskBehindProxy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, current_user, login_required
+from datetime import datetime
 from chatgpt import ChatGPT
 from splash_api import Plant_image
 from image_rec import Image_Finder
@@ -51,8 +50,8 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(60), nullable=False)
     plants = db.relationship('Plants', backref='user', lazy=True)
-
-    def __repr__(self):
+    # plant_sciname = db.relationship('Plants', backref='user', lazy=True)
+    def _repr_(self):
         return f"User('{self.username}', '{self.email}')"
 
 @login_manager.user_loader
@@ -65,10 +64,16 @@ class Plants(db.Model):
     plnt_name = db.Column(db.String(20), nullable=False)
     plnt_care = db.Column(db.JSON, nullable=False)
     date_added = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    image = db.Column(db.String(255), nullable=False)
+    # plant_sciname = db.Column(db.String(20), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    def _repr_(self):
+        return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}', '{self.image}'')"
+        # return f"Plants('{self.plnt_name}')"
 
-    def __repr__(self):
-        return f"Plants('{self.plnt_name}', '{self.plnt_care}', '{self.date_added}')"
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 def validate_image(form, field):
@@ -93,6 +98,8 @@ def process_uploaded_image(file):
 
     return result
 
+with app.app_context():
+    db.create_all()
 
 @app.route('/index')
 @app.route('/')
@@ -187,15 +194,7 @@ def Plant_name(plant_name):
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
-    # Rename plant
-    if request.method == 'POST':
-        newname = request.form.get('rename')
-        if newname is not None:
-            renamed = Plants(plnt_name=newname, user_id=current_user.id)
-            db.session.add(renamed)
-            db.session.commit()
-    # Delete plant
-    elif request.method == 'GET':
+    if request.method == 'GET':
         if(request.form.get("delete") is not None):
             plant_to_del = Plants.query.filter_by(user_id=current_user.id)
             db.session.delete(plant_to_del)
@@ -212,16 +211,35 @@ def portfolio():
 def add_to_portfolio():
     plant_name = request.json.get('plant_name')
     if plant_name:
+        plant_image = Plant_image(name=plant_name)
+        img = plant_image.image()
         plant_info = ChatGPT(plant_name)
         plant_care = plant_info.careCalendar()
         date = datetime.now()
-        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date)
+        new_plant = Plants(plnt_name=plant_name, user_id=current_user.id, plnt_care = plant_care, date_added = date, image = img)
         # new_plant = Plants(plnt_name=plant_name, user_id=current_user.id)
         db.session.add(new_plant)
         db.session.commit()
-        return {"message": "Plant added successfully!"}, 200
+        flash("Plant added successfully")
+        #return {"message": "Plant added successfully!"}, 200
     else:
         return {"message": "Error: No plant name provided."}, 400
+
+@app.route("/rename_plant", methods=['POST'])
+@login_required
+def rename_plant():
+    plant_id = request.form.get('plant_id')
+    new_name = request.form.get('new_name')
+    if plant_id and new_name:
+        plant_to_rename = db.session.get(Plants, plant_id)
+        if plant_to_rename and (plant_to_rename.user_id == current_user.id):
+            plant_to_rename.plnt_name = new_name
+            db.session.commit()
+            flash(f'Plant has been renamed to {new_name}!', 'success')
+            return redirect("/portfolio")
+        else:
+            flash('Plant not found.', 'danger')
+    #return jsonify(status='error')
 
 if __name__ == '__main__':
     app.run(debug=True)
