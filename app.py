@@ -98,7 +98,7 @@ class UploadFileForm(FlaskForm):
 
 # Function to process the uploaded image
 def process_uploaded_image(file):
-    # Set the filename to "image" and keep the original file extension
+    # Sets the filename to "image" and keep the original file extension
     filename = 'image' + os.path.splitext(file.filename)[1]
     file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
@@ -162,11 +162,12 @@ def signup():
         db.session.add(new_user)
         db.session.commit()
 
+        login_user(new_user)
         return redirect(url_for('home_page'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form = LoginForm() 
+    form = LoginForm()
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -178,7 +179,7 @@ def login():
 
         login_user(user)
         return redirect(url_for('home_page'))
-    return render_template('login.html', form=form)  # Pass the form to the template
+    return render_template('index.html', form=form)  # Pass the form to the template
 
 
 
@@ -209,6 +210,7 @@ def Plant_name(plant_name):
 @app.route("/portfolio", methods=['GET', 'POST'])
 @login_required
 def portfolio():
+    allplants = Plants.query.filter_by(user_id=current_user.id).all()
     if request.method == 'POST':
         plant_id = request.form.get('plant_id')
         if request.form.get("delete") and plant_id:
@@ -219,8 +221,9 @@ def portfolio():
                 flash(f'Plant deleted successfully!', 'success')
             else:
                 flash('Plant not found.', 'danger')
-    allplants = Plants.query.filter_by(user_id=current_user.id).all()
-    print(allplants)
+    elif  request.method == 'GET':
+        return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants=allplants)
+
     return render_template('portfolio.html', subtitle='Plant Portfolio', text='Here are all your Plant Children!', allplants=allplants)
 
 # Add plant to portfolio
@@ -244,7 +247,6 @@ def add_to_portfolio():
         return {"message": "Error: No plant name provided."}, 400
 
 @app.route("/rename_plant", methods=['POST'])
-@login_required
 def rename_plant():
     plant_id = request.form.get('plant_id')
     new_name = request.form.get('new_name')
@@ -257,7 +259,7 @@ def rename_plant():
             return jsonify(status='success')
         else:
             flash('Plant not found.', 'danger')
-    
+
     return jsonify(status = 'error')
 
 def get_data(plants_array):
