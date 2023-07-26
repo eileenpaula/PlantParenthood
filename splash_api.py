@@ -1,7 +1,5 @@
 import pprint
 import requests
-from dotenv import load_dotenv
-load_dotenv()
 # response = requests.get('https://api.unsplash.com/search/photos?page=1&query=sunflower&client_id=2THIa3M8t-GT_nc2WpNG9IeQtjjY_P32rDJM36neBOg')
 # pprint.pprint(response.json())
 import os
