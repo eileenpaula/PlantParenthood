@@ -1,7 +1,5 @@
 import json
 import requests
-from dotenv import load_dotenv
-load_dotenv()
 import os
 import openai
 openai.organization = "org-d5FqSHnir3fX9Upv0AHqEIAa"
